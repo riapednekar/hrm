@@ -2,7 +2,7 @@
   <div class="page-wrapper">
     <navbar />
     <div class="dayflow-container">
-      <!-- Header Section -->
+      <!-- Top Header Section -->
       <div class="header-card">
         <div class="header-left">
           <div class="brand-pill">
@@ -17,7 +17,7 @@
             ⚙ Manage Team Requests
           </router-link>
           <button @click="showApplyModal = true" class="btn btn-primary">
-            + Apply for Leave
+            + New Request
           </button>
         </div>
       </div>
@@ -28,63 +28,153 @@
 
       <!-- Leave Balances Section -->
       <div class="balance-grid">
-        <!-- Paid Time Off Card -->
+        <!-- Card 1: Paid Time Off -->
         <div class="balance-card pto-card">
-          <div class="balance-top">
-            <span class="balance-name">Paid Time Off</span>
-            <span class="balance-pill pill-purple">PTO</span>
+          <div class="balance-header">
+            <div class="balance-meta">
+              <span class="balance-title">Paid Time Off</span>
+              <span class="balance-total-tag">{{ balance?.paidTimeOff?.total ?? 15 }} days total</span>
+            </div>
+            <span class="type-pill pill-purple">Annual</span>
           </div>
+
           <div class="balance-center">
-            <div class="balance-remaining">
-              <span class="big-num text-purple">{{ balance?.paidTimeOff?.remaining ?? 0 }}</span>
-              <span class="sub-label">Remaining</span>
+            <div class="balance-num-row">
+              <span class="balance-big-num text-purple">{{ balance?.paidTimeOff?.remaining ?? 0 }}</span>
+              <span class="balance-unit">days remaining</span>
             </div>
-            <div class="balance-total-text">
-              {{ balance?.paidTimeOff?.total ?? 15 }} Total Days
+            <!-- Progress Bar -->
+            <div class="progress-bar-bg">
+              <div
+                class="progress-bar-fill fill-purple"
+                :style="{ width: getProgressPercent(balance?.paidTimeOff?.remaining, balance?.paidTimeOff?.total ?? 15) }"
+              ></div>
             </div>
           </div>
-          <div class="balance-bottom">
+
+          <div class="balance-footer">
             <span>Used: <strong>{{ balance?.paidTimeOff?.used ?? 0 }} days</strong></span>
+            <span>Available: <strong>{{ balance?.paidTimeOff?.remaining ?? 0 }} / {{ balance?.paidTimeOff?.total ?? 15 }}</strong></span>
           </div>
         </div>
 
-        <!-- Sick Leave Card -->
+        <!-- Card 2: Sick Leave -->
         <div class="balance-card sick-card">
-          <div class="balance-top">
-            <span class="balance-name">Sick Leave</span>
-            <span class="balance-pill pill-green">Medical</span>
+          <div class="balance-header">
+            <div class="balance-meta">
+              <span class="balance-title">Sick Leave</span>
+              <span class="balance-total-tag">{{ balance?.sickLeave?.total ?? 10 }} days total</span>
+            </div>
+            <span class="type-pill pill-green">Medical</span>
           </div>
+
           <div class="balance-center">
-            <div class="balance-remaining">
-              <span class="big-num text-green">{{ balance?.sickLeave?.remaining ?? 0 }}</span>
-              <span class="sub-label">Remaining</span>
+            <div class="balance-num-row">
+              <span class="balance-big-num text-green">{{ balance?.sickLeave?.remaining ?? 0 }}</span>
+              <span class="balance-unit">days remaining</span>
             </div>
-            <div class="balance-total-text">
-              {{ balance?.sickLeave?.total ?? 10 }} Total Days
+            <!-- Progress Bar -->
+            <div class="progress-bar-bg">
+              <div
+                class="progress-bar-fill fill-green"
+                :style="{ width: getProgressPercent(balance?.sickLeave?.remaining, balance?.sickLeave?.total ?? 10) }"
+              ></div>
             </div>
           </div>
-          <div class="balance-bottom">
+
+          <div class="balance-footer">
             <span>Used: <strong>{{ balance?.sickLeave?.used ?? 0 }} days</strong></span>
+            <span>Available: <strong>{{ balance?.sickLeave?.remaining ?? 0 }} / {{ balance?.sickLeave?.total ?? 10 }}</strong></span>
           </div>
         </div>
 
-        <!-- Unpaid Leave Card -->
+        <!-- Card 3: Unpaid Leave -->
         <div class="balance-card unpaid-card">
-          <div class="balance-top">
-            <span class="balance-name">Unpaid Leave</span>
-            <span class="balance-pill pill-amber">Unpaid</span>
+          <div class="balance-header">
+            <div class="balance-meta">
+              <span class="balance-title">Unpaid Leave</span>
+              <span class="balance-total-tag">Subject to Approval</span>
+            </div>
+            <span class="type-pill pill-amber">Unpaid</span>
           </div>
+
           <div class="balance-center">
-            <div class="balance-remaining">
-              <span class="big-num text-amber">{{ balance?.unpaidLeave?.used ?? 0 }}</span>
-              <span class="sub-label">Used</span>
+            <div class="balance-num-row">
+              <span class="balance-big-num text-amber">{{ balance?.unpaidLeave?.used ?? 0 }}</span>
+              <span class="balance-unit">days taken</span>
             </div>
-            <div class="balance-total-text">
-              Policy: Subject to Approval
+            <div class="unpaid-info-note">
+              <span>Non-deductible policy quota</span>
             </div>
           </div>
-          <div class="balance-bottom">
-            <span>Quota: <strong>Non-deductible</strong></span>
+
+          <div class="balance-footer">
+            <span>Status: <strong>Active</strong></span>
+            <span>Requires Review: <strong>Yes</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Year / Leave Calendar Section -->
+      <div class="card calendar-card">
+        <div class="calendar-header-row">
+          <div class="cal-title-group">
+            <h2 class="section-title">Leave Calendar (Year at a Glance)</h2>
+            <p class="section-subtitle">Visual overview of your scheduled and historical time-off</p>
+          </div>
+
+          <!-- Calendar Controls & Legend -->
+          <div class="cal-controls-legend">
+            <!-- Year Selector -->
+            <div class="year-navigator">
+              <button @click="currentYear--" class="year-nav-btn" title="Previous Year">&lsaquo;</button>
+              <span class="year-label">{{ currentYear }}</span>
+              <button @click="currentYear++" class="year-nav-btn" title="Next Year">&rsaquo;</button>
+            </div>
+
+            <!-- Legend Pills -->
+            <div class="cal-legend">
+              <span class="legend-item"><span class="legend-dot dot-approved"></span> Approved</span>
+              <span class="legend-item"><span class="legend-dot dot-pending"></span> Pending</span>
+              <span class="legend-item"><span class="legend-dot dot-rejected"></span> Rejected</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 12-Month Grid -->
+        <div class="year-grid">
+          <div v-for="month in monthsList" :key="month.index" class="month-box">
+            <div class="month-title">{{ month.name }}</div>
+
+            <!-- Week Header -->
+            <div class="weekdays-row">
+              <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+            </div>
+
+            <!-- Days Grid -->
+            <div class="month-days-grid">
+              <!-- Empty slots for days before 1st -->
+              <span
+                v-for="blank in getMonthBlanks(currentYear, month.index)"
+                :key="'blank-' + blank"
+                class="day-cell day-blank"
+              ></span>
+
+              <!-- Actual days -->
+              <span
+                v-for="day in getDaysInMonth(currentYear, month.index)"
+                :key="'day-' + day"
+                :class="[
+                  'day-cell',
+                  isWeekend(currentYear, month.index, day) ? 'day-weekend' : '',
+                  getDayLeaveStatusClass(currentYear, month.index, day),
+                  isToday(currentYear, month.index, day) ? 'day-today' : ''
+                ]"
+                :title="getDayTooltip(currentYear, month.index, day)"
+              >
+                {{ day }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -137,13 +227,15 @@
             </div>
 
             <!-- Duration preview if dates selected -->
-            <div v-if="calculatedDays > 0" class="duration-preview">
-              <span class="preview-icon">📅</span>
-              <span>Calculated Duration: <strong>{{ calculatedDays }}</strong> calendar day{{ calculatedDays > 1 ? 's' : '' }}</span>
+            <div v-if="calculatedDays > 0" class="duration-preview-box">
+              <div class="preview-line">
+                <span class="preview-dates">{{ formatShortDate(form.startDate) }} &rarr; {{ formatShortDate(form.endDate) }}</span>
+                <span class="preview-count"><strong>{{ calculatedDays }}</strong> calendar day{{ calculatedDays > 1 ? 's' : '' }}</span>
+              </div>
             </div>
 
             <div class="form-group">
-              <label for="remarks" class="form-label">Remarks <span class="required">*</span></label>
+              <label for="remarks" class="form-label">Remarks / Purpose <span class="required">*</span></label>
               <textarea
                 id="remarks"
                 v-model="form.remarks"
@@ -170,8 +262,8 @@
       <div class="card">
         <div class="card-header-flex">
           <div>
-            <h2 class="section-title">My Leave Requests</h2>
-            <p class="section-subtitle">Track your leave requests and approval status.</p>
+            <h2 class="section-title">My Requests</h2>
+            <p class="section-subtitle">Track your personal leave applications and management review feedback</p>
           </div>
           <span class="count-pill">{{ requests.length }} requests</span>
         </div>
@@ -214,7 +306,7 @@
 
         <!-- Empty State -->
         <div v-else class="empty-box">
-          You have not submitted any leave requests yet. Click <strong>"+ Apply for Leave"</strong> to submit your first application.
+          You have not submitted any leave requests yet. Click <strong>"+ New Request"</strong> to submit your first application.
         </div>
       </div>
     </div>
@@ -230,6 +322,21 @@ export default {
   components: { navbar },
   data() {
     return {
+      currentYear: new Date().getFullYear(),
+      monthsList: [
+        { name: 'January', index: 0 },
+        { name: 'February', index: 1 },
+        { name: 'March', index: 2 },
+        { name: 'April', index: 3 },
+        { name: 'May', index: 4 },
+        { name: 'June', index: 5 },
+        { name: 'July', index: 6 },
+        { name: 'August', index: 7 },
+        { name: 'September', index: 8 },
+        { name: 'October', index: 9 },
+        { name: 'November', index: 10 },
+        { name: 'December', index: 11 },
+      ],
       balance: null,
       balanceLoading: false,
       requests: [],
@@ -268,12 +375,82 @@ export default {
     this.fetchMyRequests();
   },
   methods: {
+    getProgressPercent(remaining, total) {
+      if (!total || total <= 0) return '0%';
+      const val = Math.max(0, Math.min(100, (Number(remaining || 0) / Number(total)) * 100));
+      return `${val}%`;
+    },
+    getMonthBlanks(year, monthIndex) {
+      const firstDay = new Date(year, monthIndex, 1).getDay();
+      return Array.from({ length: firstDay }, (_, i) => i);
+    },
+    getDaysInMonth(year, monthIndex) {
+      const count = new Date(year, monthIndex + 1, 0).getDate();
+      return Array.from({ length: count }, (_, i) => i + 1);
+    },
+    formatDateStr(year, monthIndex, day) {
+      const m = String(monthIndex + 1).padStart(2, '0');
+      const d = String(day).padStart(2, '0');
+      return `${year}-${m}-${d}`;
+    },
+    isWeekend(year, monthIndex, day) {
+      const dayOfWeek = new Date(year, monthIndex, day).getDay();
+      return dayOfWeek === 0 || dayOfWeek === 6;
+    },
+    isToday(year, monthIndex, day) {
+      const now = new Date();
+      return (
+        now.getFullYear() === year &&
+        now.getMonth() === monthIndex &&
+        now.getDate() === day
+      );
+    },
+    getDayLeaveStatus(year, monthIndex, day) {
+      const dateStr = this.formatDateStr(year, monthIndex, day);
+      for (const req of this.requests) {
+        if (!req.startDate || !req.endDate) continue;
+        const start = req.startDate.slice(0, 10);
+        const end = req.endDate.slice(0, 10);
+        if (dateStr >= start && dateStr <= end) {
+          return req.status; // 'Approved', 'Pending', 'Rejected'
+        }
+      }
+      return null;
+    },
+    getDayLeaveStatusClass(year, monthIndex, day) {
+      const status = this.getDayLeaveStatus(year, monthIndex, day);
+      if (status === 'Approved') return 'day-approved';
+      if (status === 'Pending') return 'day-pending';
+      if (status === 'Rejected') return 'day-rejected';
+      return '';
+    },
+    getDayTooltip(year, monthIndex, day) {
+      const dateStr = this.formatDateStr(year, monthIndex, day);
+      for (const req of this.requests) {
+        if (!req.startDate || !req.endDate) continue;
+        const start = req.startDate.slice(0, 10);
+        const end = req.endDate.slice(0, 10);
+        if (dateStr >= start && dateStr <= end) {
+          return `${dateStr}: ${req.leaveType} (${req.status})`;
+        }
+      }
+      return dateStr;
+    },
     formatDate(dateVal) {
       if (!dateVal) return '--';
       const d = new Date(dateVal);
       if (isNaN(d.getTime())) return String(dateVal).split('T')[0];
       return d.toLocaleDateString(undefined, {
         year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+    },
+    formatShortDate(dateVal) {
+      if (!dateVal) return '';
+      const d = new Date(dateVal);
+      if (isNaN(d.getTime())) return String(dateVal);
+      return d.toLocaleDateString(undefined, {
         month: 'short',
         day: 'numeric',
       });
@@ -363,7 +540,7 @@ export default {
 }
 
 .dayflow-container {
-  max-width: 1200px;
+  max-width: 1250px;
   margin: 1.75rem auto;
   padding: 0 1.25rem 3rem 1.25rem;
 }
@@ -464,20 +641,31 @@ export default {
   justify-content: space-between;
 }
 
-.balance-top {
+.balance-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.25rem;
+  align-items: flex-start;
+  margin-bottom: 1rem;
 }
 
-.balance-name {
+.balance-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.balance-title {
   font-size: 0.95rem;
   font-weight: 700;
   color: #172033;
 }
 
-.balance-pill {
+.balance-total-tag {
+  font-size: 0.78rem;
+  color: #7b8496;
+}
+
+.type-pill {
   font-size: 0.72rem;
   font-weight: 700;
   padding: 0.2rem 0.55rem;
@@ -508,24 +696,24 @@ export default {
 .balance-center {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.6rem;
   margin-bottom: 1rem;
 }
 
-.balance-remaining {
+.balance-num-row {
   display: flex;
   align-items: baseline;
   gap: 0.45rem;
 }
 
-.big-num {
+.balance-big-num {
   font-size: 2.2rem;
   font-weight: 800;
   line-height: 1;
 }
 
-.sub-label {
-  font-size: 0.9rem;
+.balance-unit {
+  font-size: 0.88rem;
   color: #7b8496;
   font-weight: 600;
 }
@@ -534,20 +722,39 @@ export default {
 .text-green { color: #16a34a; }
 .text-amber { color: #d97706; }
 
-.balance-total-text {
-  font-size: 0.85rem;
-  color: #7b8496;
-  font-weight: 500;
+/* Progress Bars */
+.progress-bar-bg {
+  width: 100%;
+  height: 6px;
+  background-color: #f1f4f9;
+  border-radius: 9999px;
+  overflow: hidden;
 }
 
-.balance-bottom {
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
+.fill-purple { background-color: #6040a0; }
+.fill-green { background-color: #16a34a; }
+
+.unpaid-info-note {
+  font-size: 0.78rem;
+  color: #7b8496;
+}
+
+.balance-footer {
   border-top: 1px solid #f1f4f9;
   padding-top: 0.75rem;
   font-size: 0.82rem;
   color: #7b8496;
+  display: flex;
+  justify-content: space-between;
 }
 
-.balance-bottom strong {
+.balance-footer strong {
   color: #172033;
 }
 
@@ -588,6 +795,167 @@ export default {
   border-radius: 9999px;
   font-size: 0.82rem;
   font-weight: 700;
+}
+
+/* Year Calendar */
+.calendar-card {
+  overflow: hidden;
+}
+
+.calendar-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #f1f4f9;
+  padding-bottom: 1rem;
+}
+
+.cal-controls-legend {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.year-navigator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #f8fafc;
+  border: 1px solid #e7eaf0;
+  border-radius: 8px;
+  padding: 0.2rem 0.5rem;
+}
+
+.year-nav-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #6040a0;
+  cursor: pointer;
+  padding: 0 0.4rem;
+  line-height: 1;
+}
+
+.year-nav-btn:hover {
+  color: #4b2f78;
+}
+
+.year-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #172033;
+  padding: 0 0.25rem;
+}
+
+.cal-legend {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.82rem;
+  color: #475569;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.dot-approved { background-color: #16a34a; }
+.dot-pending { background-color: #d97706; }
+.dot-rejected { background-color: #dc2626; }
+
+/* 12 Months Grid */
+.year-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+
+.month-box {
+  background-color: #f9fbfe;
+  border: 1px solid #eef2f6;
+  border-radius: 12px;
+  padding: 0.9rem;
+}
+
+.month-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #172033;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.weekdays-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #94a3b8;
+  margin-bottom: 0.35rem;
+}
+
+.month-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  text-align: center;
+}
+
+.day-cell {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #334155;
+  padding: 0.25rem 0;
+  border-radius: 4px;
+  cursor: default;
+  transition: all 0.15s;
+}
+
+.day-blank {
+  visibility: hidden;
+}
+
+.day-weekend {
+  color: #94a3b8;
+}
+
+.day-today {
+  font-weight: 800;
+  outline: 1px solid #6040a0;
+  outline-offset: -1px;
+}
+
+.day-approved {
+  background-color: #dcfce7 !important;
+  color: #15803d !important;
+  font-weight: 700 !important;
+}
+
+.day-pending {
+  background-color: #fef3c7 !important;
+  color: #b45309 !important;
+  font-weight: 700 !important;
+}
+
+.day-rejected {
+  background-color: #fee2e2 !important;
+  color: #b91c1c !important;
+  font-weight: 700 !important;
+  text-decoration: line-through;
 }
 
 /* Table */
@@ -766,16 +1134,27 @@ export default {
   box-shadow: 0 0 0 3px rgba(96, 64, 160, 0.1);
 }
 
-.duration-preview {
-  background-color: #f8f6fc;
+.duration-preview-box {
+  background-color: #f9f8fc;
   border: 1px solid #e5dcf4;
   border-radius: 8px;
-  padding: 0.65rem 0.85rem;
-  font-size: 0.85rem;
-  color: #6040a0;
+  padding: 0.75rem 1rem;
+}
+
+.preview-line {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
+  font-size: 0.88rem;
+  color: #6040a0;
+}
+
+.preview-dates {
+  font-weight: 600;
+}
+
+.preview-count {
+  font-size: 0.85rem;
 }
 
 .modal-actions {
@@ -844,6 +1223,16 @@ export default {
   border: 1px solid #fecaca;
 }
 
+/* Pills */
+.pill {
+  display: inline-block;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .loading-box,
 .empty-box {
   text-align: center;
@@ -859,6 +1248,11 @@ export default {
   }
   .form-row {
     grid-template-columns: 1fr;
+  }
+  .cal-controls-legend {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
   }
 }
 </style>

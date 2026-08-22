@@ -28,7 +28,8 @@ export default {
         if (res.data.user.role === 'Admin') {
           this.$router.push('/employees');
         } else {
-          alert('Logged in as Employee!');
+          this.$router.push('/attendance');
+
         }
       } catch (err) {
         this.error = err.response?.data?.message || 'Login failed';

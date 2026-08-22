@@ -3,27 +3,49 @@
     <navbar />
     
     <div class="container">
-      <!-- Top Header Banner -->
+      <!-- Top Header Banner & Search -->
       <div class="header-section">
-        <div>
-          <span class="tag-pill">• Dayflow</span>
-          <h1 class="page-title">Employee Directory</h1>
-          <p class="page-sub">Comprehensive overview of company personnel and payroll structures.</p>
+        <div class="header-content">
+          <div>
+            <span class="tag-pill">• Dayflow</span>
+            <h1 class="page-title">Employee Directory</h1>
+            <p class="page-sub">Comprehensive overview of company personnel and payroll structures.</p>
+          </div>
+
+          <div class="search-box">
+            <input 
+              v-model="searchQuery" 
+              type="text" 
+              placeholder="Search employee by name, ID, or dept..." 
+              class="search-input"
+            />
+            <span v-if="searchQuery" @click="searchQuery = ''" class="clear-btn">✕</span>
+          </div>
         </div>
       </div>
 
       <!-- Employee Cards Grid -->
       <div class="grid">
-        <div v-for="emp in employees" :key="emp._id" class="employee-card" @click="openModal(emp)">
+        <div 
+          v-for="emp in filteredEmployees" 
+          :key="emp._id" 
+          class="employee-card" 
+          @click="openModal(emp)"
+        >
           <div class="card-top">
             <span class="card-section-label">EMPLOYEE PROFILE</span>
             <span class="id-pill">ID: {{ emp.loginId || emp.employeeId || 'EMP-1001' }}</span>
           </div>
 
           <div class="card-body">
-            <div class="field-group">
-              <span class="field-label">Full Name</span>
-              <h3 class="emp-name">{{ emp.firstName }} {{ emp.lastName }}</h3>
+            <div class="avatar-row">
+              <div class="avatar-circle">
+                {{ getInitials(emp.firstName, emp.lastName) }}
+              </div>
+              <div>
+                <h3 class="emp-name">{{ emp.firstName }} {{ emp.lastName }}</h3>
+                <p class="emp-dept">{{ emp.department || 'General' }} • {{ emp.designation || 'Associate' }}</p>
+              </div>
             </div>
 
             <div class="field-group">
@@ -35,17 +57,16 @@
               <span class="field-label">Phone Number</span>
               <p class="field-val">{{ emp.phone || '9988776655' }}</p>
             </div>
-
-            <div class="field-group">
-              <span class="field-label">Department & Designation</span>
-              <p class="field-val">{{ emp.department || 'General' }} • {{ emp.designation || 'Associate' }}</p>
-            </div>
           </div>
 
           <div class="card-bottom">
-            <span>Role: <strong class="role-bold">{{ emp.role || 'EMPLOYEE' }}</strong></span>
+            <span>Role: <strong class="role-bold">{{ emp.role || 'employee' }}</strong></span>
             <span class="joined-text">Joined: {{ emp.yearOfJoining || 2026 }}</span>
           </div>
+        </div>
+
+        <div v-if="filteredEmployees.length === 0" class="no-results">
+          No employees found matching "{{ searchQuery }}".
         </div>
       </div>
 
@@ -86,83 +107,39 @@
           </div>
         </div>
       </div>
-    </header>
-
-    <!-- Content Area -->
-    <main class="flex-1 p-6 sm:p-8 max-w-7xl w-full mx-auto space-y-6">
-      <!-- Action Bar: Add Button & Search -->
-      <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-white border border-slate-200 p-4 sm:p-6 rounded-2xl shadow-sm">
-        <div class="flex items-center gap-3">
-          <button 
-            v-if="isAdmin" 
-            @click="$router.push('/admin/dashboard')" 
-            class="px-5 py-2.5 bg-[#593c8f] hover:bg-[#4a2e7b] active:scale-95 text-white font-semibold text-xs rounded-xl shadow-sm transition cursor-pointer"
-          >
-            + Add / Manage in Admin
-          </button>
-          <h1 class="text-base font-bold text-slate-900">Employee Directory</h1>
-        </div>
-
-        <div class="relative">
-          <input 
-            v-model="searchQuery" 
-            type="text" 
-            placeholder="Search employee..." 
-            class="w-full sm:w-72 px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:ring-2 focus:ring-[#5e3b8a] outline-none shadow-2xs"
-          />
-          <span v-if="searchQuery" @click="searchQuery = ''" class="absolute right-3 top-2 text-slate-400 hover:text-slate-600 cursor-pointer text-xs">✕</span>
-        </div>
-      </div>
-
-      <!-- Employee Cards Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-        <div 
-          v-for="emp in filteredEmployees" 
-          :key="emp._id" 
-          @click="viewEmployeeProfile(emp._id)"
-          class="bg-white border border-slate-200/90 hover:border-[#593c8f]/60 rounded-2xl p-5 cursor-pointer hover:shadow-md transition relative group flex flex-col items-center shadow-xs"
-        >
-          <!-- Status Indicator Icon -->
-          <div class="absolute top-4 right-4">
-            <span v-if="emp.status === 'present'" class="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] block" title="Present in office"></span>
-            <span v-else-if="emp.status === 'on_leave'" class="w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_8px_#3b82f6] block" title="On leave"></span>
-            <span v-else class="w-3 h-3 rounded-full bg-slate-300 block" title="Offline"></span>
-          </div>
-
-          <!-- Profile Avatar -->
-          <div class="w-16 h-16 rounded-full bg-purple-50 border-2 border-purple-200 flex items-center justify-center my-3 text-[#593c8f] font-bold text-lg group-hover:border-[#593c8f] transition shadow-2xs">
-            {{ getInitials(emp.firstName, emp.lastName) }}
-          </div>
-
-          <!-- Basic Employee Details -->
-          <h3 class="font-bold text-slate-900 text-sm text-center group-hover:text-[#593c8f] transition">{{ emp.firstName }} {{ emp.lastName }}</h3>
-          <p class="text-[11px] text-slate-500 font-mono mt-0.5">{{ emp.loginId }}</p>
-          <p class="text-[11px] text-slate-600 mt-1">{{ emp.department || 'General' }} • {{ emp.designation || 'Associate' }}</p>
-          <span 
-            class="mt-3 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full"
-            :class="emp.role === 'admin' ? 'bg-purple-100 text-[#593c8f] border border-purple-200' : 'bg-slate-100 text-slate-700 border border-slate-200'"
-          >
-            {{ emp.role }}
-          </span>
-        </div>
-
-        <div v-if="filteredEmployees.length === 0" class="col-span-full py-12 text-center text-slate-400 text-xs">
-          No employees found matching "{{ searchQuery }}".
-        </div>
-      </div>
-    </main>
+    </div>
   </div>
 </template>
 
 <script>
+import navbar from '../components/navbar.vue';
 import api from '../api/axios';
 
 export default {
+  components: { navbar },
   data() {
     return { 
       employees: [], 
-      selectedEmployee: null 
+      selectedEmployee: null,
+      searchQuery: '',
     };
+  },
+  computed: {
+    filteredEmployees() {
+      if (!this.searchQuery) return this.employees;
+      const q = this.searchQuery.toLowerCase();
+      return this.employees.filter((emp) => {
+        const name = `${emp.firstName || ''} ${emp.lastName || ''}`.toLowerCase();
+        const loginId = (emp.loginId || emp.employeeId || '').toLowerCase();
+        const dept = (emp.department || '').toLowerCase();
+        const email = (emp.email || '').toLowerCase();
+        return name.includes(q) || loginId.includes(q) || dept.includes(q) || email.includes(q);
+      });
+    },
+    isAdmin() {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      return (user.role || '').toLowerCase() === 'admin';
+    }
   },
   async mounted() {
     try {
@@ -170,14 +147,13 @@ export default {
       this.employees = res.data;
     } catch (err) {
       console.warn('Could not fetch employees, using local profile fallback');
-      // Fallback mock if backend empty
       const user = JSON.parse(localStorage.getItem('user') || '{}');
       this.employees = [
         {
           _id: '1',
           firstName: user.firstName || 'Jane',
           lastName: user.lastName || 'Doe',
-          email: user.email || 'jane.doe@acme.com',
+          email: user.email || 'jane.doe@dayflow.com',
           phone: user.phone || '9988776655',
           loginId: user.loginId || 'DAJADO20260002',
           role: user.role || 'Admin',
@@ -189,6 +165,11 @@ export default {
     }
   },
   methods: {
+    getInitials(firstName, lastName) {
+      const f = (firstName || 'J').charAt(0).toUpperCase();
+      const l = (lastName || 'D').charAt(0).toUpperCase();
+      return `${f}${l}`;
+    },
     openModal(emp) { this.selectedEmployee = emp; },
     goToProfile(emp) {
       if (emp._id) {
@@ -224,6 +205,14 @@ export default {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+
 .tag-pill {
   background: #f3e8ff;
   color: #6b21a8;
@@ -232,14 +221,14 @@ export default {
   padding: 0.25rem 0.65rem;
   border-radius: 9999px;
   display: inline-block;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
 .page-title {
   font-size: 1.75rem;
   font-weight: 800;
   color: #0f172a;
-  margin: 0 0 0.4rem 0;
+  margin: 0 0 0.25rem 0;
   letter-spacing: -0.5px;
 }
 
@@ -249,9 +238,41 @@ export default {
   margin: 0;
 }
 
+.search-box {
+  position: relative;
+  min-width: 280px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.6rem 2rem 0.6rem 1rem;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  color: #0f172a;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.search-input:focus {
+  border-color: #6b21a8;
+  background: #ffffff;
+}
+
+.clear-btn {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.5rem;
 }
 
@@ -298,6 +319,40 @@ export default {
   border-radius: 6px;
 }
 
+.avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.avatar-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #f3e8ff;
+  border: 2px solid #d8b4fe;
+  color: #6b21a8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.emp-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.emp-dept {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0.15rem 0 0 0;
+}
+
 .card-body {
   display: flex;
   flex-direction: column;
@@ -317,15 +372,8 @@ export default {
   font-weight: 500;
 }
 
-.emp-name {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #0f172a;
-  margin: 0;
-}
-
 .field-val {
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   color: #334155;
   margin: 0;
   font-weight: 500;
@@ -348,6 +396,14 @@ export default {
 
 .joined-text {
   color: #94a3b8;
+}
+
+.no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #94a3b8;
+  font-size: 0.95rem;
 }
 
 /* Modal */

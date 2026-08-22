@@ -4,7 +4,7 @@
       <!-- Left: Logo, Portal Badge & Nav Links -->
       <div class="brand-section">
         <!-- Dayflow Logo (Lotus flower + text) -->
-        <router-link :to="dashboardRoute" class="logo-group">
+        <router-link :to="homeRoute" class="logo-group">
           <svg class="lotus-icon" viewBox="0 0 40 32" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M7 23C4.5 19.5 5 15 8 13.5C11 12 14.5 15 17 21" stroke="#172033" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M12 24C10 17 11.5 10 15 8C18 6 19.5 11 20 23" stroke="#172033" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -42,9 +42,13 @@
       <!-- Right: User Avatar & Logout -->
       <div v-if="user" class="user-section">
         <!-- User Avatar Circle -->
-        <div class="user-avatar" :title="`${user.firstName || ''} ${user.lastName || ''} (${user.role || ''})`">
+        <router-link 
+          to="/profile"
+          class="user-avatar" 
+          :title="`${user.firstName || ''} ${user.lastName || ''} (${user.role || ''})`"
+        >
           {{ userInitials }}
-        </div>
+        </router-link>
 
         <!-- Logout Button -->
         <button @click="logout" class="logout-btn" title="Sign out">
@@ -67,7 +71,7 @@ export default {
     isAdmin() {
       return (this.user?.role || '').toLowerCase() === 'admin';
     },
-    dashboardRoute() {
+    homeRoute() {
       return this.isAdmin ? '/admin/dashboard' : '/employee/dashboard';
     },
     userInitials() {
@@ -84,8 +88,7 @@ export default {
   },
   methods: {
     logout() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      localStorage.clear();
       this.$router.push('/login');
     },
   },
@@ -204,6 +207,13 @@ export default {
   align-items: center;
   justify-content: center;
   letter-spacing: 0.02em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.user-avatar:hover {
+  opacity: 0.9;
 }
 
 .logout-btn {

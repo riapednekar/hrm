@@ -1,13 +1,19 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
+const dotenv = require('dotenv');
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '.env') });
 
-const authroutes = require('./routes/authroutes');
-const employeeroutes = require('./routes/employeeroutes');
-const attendanceroutes = require('./routes/attendanceroutes');
-const leaveroutes = require('./routes/leaveroutes');
+// Load environment variables
+dotenv.config({ path: path.join(__dirname, '.env') });
+
+// Import Models & Routes
+const User = require('./models/user');
+const authRoutes = require('./routes/authroutes');
+const employeeRoutes = require('./routes/employeeroutes');
+const attendanceRoutes = require('./routes/attendanceroutes');
+const leaveRoutes = require('./routes/leaveroutes');
 
 const app = express();
 
@@ -16,24 +22,68 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use('/api/auth', authroutes);
-app.use('/api/employees', employeeroutes);
-app.use('/api/attendance', attendanceroutes);
-app.use('/api/leaves', leaveroutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/employees', employeeRoutes);
+app.use('/api/attendance', attendanceRoutes);
+app.use('/api/leaves', leaveRoutes);
+app.use('/api/leave', leaveRoutes); // Alias for compatibility
 
-// Test Route
+// Health check & test endpoints
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', time: new Date().toISOString() });
+});
+
 app.get('/', (req, res) => {
     res.send('HRMS Backend API is running...');
 });
 
-// MongoDB Connection
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/hrms_db';
-mongoose
-    .connect(MONGO_URI)
-    .then(() => console.log('MongoDB Connected Successfully'))
-    .catch((err) => console.error('MongoDB Connection Error:', err));
+// Seed Initial Admin User if not existing
+async function seedAdmin() {
+    try {
+        const existingAdmin = await User.findOne({ 
+            $or: [{ email: 'admin@dayflow.com' }, { role: 'admin' }] 
+        });
+        
+        if (!existingAdmin) {
+            const hashedPassword = await bcrypt.hash('admin123', 10);
+            const adminUser = new User({
+                companyName: 'Dayflow Inc.',
+                firstName: 'Admin',
+                lastName: 'HR',
+                email: 'admin@dayflow.com',
+                phone: '+91 98765 43210',
+                password: hashedPassword,
+                loginId: 'DFADHR20260001',
+                role: 'admin',
+                department: 'Human Resources',
+                designation: 'HR Administrator',
+                isFirstLogin: false,
+            });
+            await adminUser.save();
+            console.log('Default Admin account created: admin@dayflow.com / admin123 (Login ID: DFADHR20260001)');
+        }
+    } catch (err) {
+        console.error('Error seeding admin account:', err.message);
+    }
+}
 
+// Database Connection & Server Initialization
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on port ${PORT}`);
-});
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/hrms_db';
+
+mongoose.connect(MONGO_URI)
+    .then(async () => {
+        console.log('MongoDB Connected Successfully');
+        await seedAdmin();
+        app.listen(PORT, '0.0.0.0', () => {
+            console.log(`Server running on port ${PORT}`);
+        });
+    })
+    .catch((err) => {
+        console.error('MongoDB connection error:', err);
+        app.listen(PORT, '0.0.0.0', () => {
+            console.log(`Server running on port ${PORT} (Database disconnected)`);
+        });
+    });
+
+module.exports = app;

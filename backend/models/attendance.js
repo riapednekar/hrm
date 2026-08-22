@@ -2,17 +2,35 @@ const mongoose = require('mongoose');
 
 const attendanceSchema = new mongoose.Schema(
     {
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            index: true
+        },
         userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
-            required: true,
             index: true
+        },
+        loginId: {
+            type: String
+        },
+        name: {
+            type: String
+        },
+        companyName: {
+            type: String
         },
         date: {
             type: String,
-            required: true
+            required: true,
+            index: true
         },
         checkIn: {
+            type: Date,
+            default: null
+        },
+        checkInTime: {
             type: Date,
             default: null
         },
@@ -20,7 +38,15 @@ const attendanceSchema = new mongoose.Schema(
             type: Date,
             default: null
         },
+        checkOutTime: {
+            type: Date,
+            default: null
+        },
         workHours: {
+            type: Number,
+            default: 0
+        },
+        totalHours: {
             type: Number,
             default: 0
         },
@@ -30,14 +56,12 @@ const attendanceSchema = new mongoose.Schema(
         },
         status: {
             type: String,
-            enum: ['Present', 'Absent', 'Half-day', 'Leave'],
             default: 'Present'
         }
     },
     { timestamps: true }
 );
 
-// Unique compound index to ensure one attendance record per employee per day
-attendanceSchema.index({ userId: 1, date: 1 }, { unique: true });
+attendanceSchema.index({ userId: 1, date: 1 });
 
 module.exports = mongoose.model('Attendance', attendanceSchema);

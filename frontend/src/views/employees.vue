@@ -1,6 +1,6 @@
 <template>
   <div class="directory-page">
-    <navbar />
+    <Navbar />
     
     <div class="container">
       <!-- Top Header Banner & Search -->
@@ -9,7 +9,7 @@
           <div>
             <span class="tag-pill">• Dayflow</span>
             <h1 class="page-title">Employee Directory</h1>
-            <p class="page-sub">Comprehensive overview of company personnel and payroll structures.</p>
+            <p class="page-sub">Comprehensive overview of company personnel, roles, and profiles.</p>
           </div>
 
           <div class="search-box">
@@ -112,19 +112,24 @@
 </template>
 
 <script>
-import navbar from '../components/navbar.vue';
+import Navbar from '../components/navbar.vue';
 import api from '../api/axios';
 
 export default {
-  components: { navbar },
+  name: 'Employees',
+  components: { Navbar },
   data() {
     return { 
       employees: [], 
       selectedEmployee: null,
       searchQuery: '',
+      user: JSON.parse(localStorage.getItem('user') || '{}'),
     };
   },
   computed: {
+    isAdmin() {
+      return (this.user.role || '').toLowerCase() === 'admin';
+    },
     filteredEmployees() {
       if (!this.searchQuery) return this.employees;
       const q = this.searchQuery.toLowerCase();
@@ -136,39 +141,38 @@ export default {
         return name.includes(q) || loginId.includes(q) || dept.includes(q) || email.includes(q);
       });
     },
-    isAdmin() {
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      return (user.role || '').toLowerCase() === 'admin';
-    }
   },
   async mounted() {
-    try {
-      const res = await api.get('/employees');
-      this.employees = res.data;
-    } catch (err) {
-      console.warn('Could not fetch employees, using local profile fallback');
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      this.employees = [
-        {
-          _id: '1',
-          firstName: user.firstName || 'Jane',
-          lastName: user.lastName || 'Doe',
-          email: user.email || 'jane.doe@dayflow.com',
-          phone: user.phone || '9988776655',
-          loginId: user.loginId || 'DAJADO20260002',
-          role: user.role || 'Admin',
-          department: 'General',
-          designation: 'Associate',
-          yearOfJoining: 2026
-        }
-      ];
-    }
+    await this.fetchEmployees();
   },
   methods: {
     getInitials(firstName, lastName) {
       const f = (firstName || 'J').charAt(0).toUpperCase();
       const l = (lastName || 'D').charAt(0).toUpperCase();
       return `${f}${l}`;
+    },
+    async fetchEmployees() {
+      try {
+        const res = await api.get('/employees');
+        this.employees = res.data;
+      } catch (err) {
+        console.warn('Could not fetch employees, using local profile fallback');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        this.employees = [
+          {
+            _id: user._id || '1',
+            firstName: user.firstName || 'Jane',
+            lastName: user.lastName || 'Doe',
+            email: user.email || 'jane.doe@dayflow.com',
+            phone: user.phone || '9988776655',
+            loginId: user.loginId || 'DAJADO20260002',
+            role: user.role || 'Admin',
+            department: user.department || 'General',
+            designation: user.designation || 'Associate',
+            yearOfJoining: 2026
+          }
+        ];
+      }
     },
     openModal(emp) { this.selectedEmployee = emp; },
     goToProfile(emp) {

@@ -1,26 +1,30 @@
 <template>
-  <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-xs px-6 py-3">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
+  <nav class="dayflow-navbar">
+    <div class="nav-container">
       <!-- Left: Logo, Portal Badge & Nav Links -->
-      <div class="flex items-center gap-6 lg:gap-8">
-        <!-- Logo & Brand -->
-        <router-link :to="homeRoute" class="flex items-center gap-2.5 text-decoration-none group">
-          <img src="/logo.png" alt="Dayflow Logo" class="h-7 w-auto object-contain" />
-          <span class="font-serif font-bold text-xl text-slate-900 tracking-tight" style="font-family: Georgia, serif;">Dayflow</span>
+      <div class="brand-section">
+        <!-- Dayflow Logo (Lotus flower + text) -->
+        <router-link :to="homeRoute" class="logo-group">
+          <svg class="lotus-icon" viewBox="0 0 40 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 23C4.5 19.5 5 15 8 13.5C11 12 14.5 15 17 21" stroke="#172033" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 24C10 17 11.5 10 15 8C18 6 19.5 11 20 23" stroke="#172033" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M20 5C17.5 10 17.5 19 20 25C22.5 19 22.5 10 20 5Z" stroke="#172033" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M28 24C30 17 28.5 10 25 8C22 6 20.5 11 20 23" stroke="#172033" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M33 23C35.5 19.5 35 15 32 13.5C29 12 25.5 15 23 21" stroke="#172033" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M14 25C17 26 23 26 26 25" stroke="#172033" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <span class="logo-text">Dayflow</span>
         </router-link>
 
-        <!-- Portal Badge -->
-        <span 
-          v-if="user" 
-          class="text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider hidden sm:inline-block"
-          :class="isAdmin ? 'bg-purple-100 border border-purple-200 text-[#593c8f]' : 'bg-purple-50 border border-purple-200 text-[#593c8f]'"
-        >
+        <!-- Portal Pill Badge -->
+        <span v-if="user" class="portal-badge">
           {{ isAdmin ? 'Admin Portal' : 'Employee Portal' }}
         </span>
 
         <!-- Navigation Links -->
-        <div v-if="user" class="hidden md:flex items-center gap-5 text-sm font-medium">
+        <div v-if="user" class="nav-links">
           <template v-if="isAdmin">
+<<<<<<< HEAD
             <router-link 
               to="/admin/dashboard" 
               class="text-slate-600 hover:text-[#593c8f] transition pb-1"
@@ -56,9 +60,16 @@
             >
               Salary & Payroll
             </router-link>
+=======
+            <router-link to="/admin/dashboard" class="nav-tab">Dashboard</router-link>
+            <router-link to="/employees" class="nav-tab">Directory</router-link>
+            <router-link to="/admin/attendance" class="nav-tab">Attendance</router-link>
+            <router-link to="/admin/leaves" class="nav-tab">Leave Requests</router-link>
+            <router-link to="/profile" class="nav-tab">My Profile</router-link>
+>>>>>>> 5ab6467fdad19cbb2eb2d783ecc211dd50731e33
           </template>
-
           <template v-else>
+<<<<<<< HEAD
             <router-link 
               to="/employee/dashboard" 
               class="text-slate-600 hover:text-[#593c8f] transition pb-1"
@@ -94,26 +105,29 @@
             >
               My Profile
             </router-link>
+=======
+            <router-link to="/employee/dashboard" class="nav-tab">Dashboard</router-link>
+            <router-link to="/attendance" class="nav-tab">Attendance</router-link>
+            <router-link to="/leave" class="nav-tab">Time Off</router-link>
+            <router-link to="/profile" class="nav-tab">My Profile</router-link>
+>>>>>>> 5ab6467fdad19cbb2eb2d783ecc211dd50731e33
           </template>
         </div>
       </div>
 
-      <!-- Right: User Avatar & Logout Controls -->
-      <div v-if="user" class="flex items-center gap-4">
+      <!-- Right: User Avatar & Logout -->
+      <div v-if="user" class="user-section">
         <!-- User Avatar Circle -->
         <router-link 
           to="/profile"
-          class="w-9 h-9 rounded-full bg-[#593c8f] hover:bg-[#4a2e7b] text-white font-bold flex items-center justify-center border border-purple-300 focus:outline-none transition shadow-sm text-sm"
-          :title="`${user.firstName} ${user.lastName} (${user.role})`"
+          class="user-avatar" 
+          :title="`${user.firstName || ''} ${user.lastName || ''} (${user.role || ''})`"
         >
           {{ userInitials }}
         </router-link>
 
         <!-- Logout Button -->
-        <button 
-          @click="logout" 
-          class="px-3 py-1.5 bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-700 text-xs font-semibold rounded-lg border border-slate-200 transition cursor-pointer"
-        >
+        <button @click="logout" class="logout-btn" title="Sign out">
           Logout
         </button>
       </div>
@@ -156,3 +170,155 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.dayflow-navbar {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e7eaf0;
+  padding: 0.65rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.nav-container {
+  max-width: 1250px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.logo-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.lotus-icon {
+  width: 28px;
+  height: 24px;
+}
+
+.logo-text {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #172033;
+  letter-spacing: -0.03em;
+  font-family: Georgia, serif, system-ui;
+}
+
+.portal-badge {
+  background-color: #f3eefa;
+  color: #6040a0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.25rem 0.7rem;
+  border-radius: 9999px;
+  letter-spacing: 0.02em;
+  border: 1px solid #e9d5ff;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 0.75rem;
+}
+
+.nav-tab {
+  color: #7b8496;
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 500;
+  padding: 0.5rem 0.9rem;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.nav-tab:hover {
+  color: #172033;
+}
+
+.nav-tab.router-link-active {
+  color: #172033;
+  font-weight: 700;
+}
+
+.nav-tab.router-link-active::after {
+  content: '';
+  position: absolute;
+  bottom: -0.65rem;
+  left: 0.9rem;
+  right: 0.9rem;
+  height: 2.5px;
+  background-color: #6040a0;
+  border-radius: 2px;
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background-color: #6040a0;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.user-avatar:hover {
+  opacity: 0.9;
+}
+
+.logout-btn {
+  background-color: #ffffff;
+  color: #dc2626;
+  border: 1px solid #fee2e2;
+  padding: 0.35rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.logout-btn:hover {
+  background-color: #fef2f2;
+  border-color: #fca5a5;
+}
+
+@media (max-width: 768px) {
+  .dayflow-navbar {
+    padding: 0.6rem 1rem;
+  }
+  .portal-badge {
+    display: none;
+  }
+  .nav-links {
+    gap: 0.25rem;
+    overflow-x: auto;
+  }
+}
+</style>

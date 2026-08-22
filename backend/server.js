@@ -3,9 +3,10 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const path = require('path');
 
 // Load environment variables
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 // Import Models & Routes
 const User = require('./models/user');
@@ -29,9 +30,13 @@ app.use('/api/leaves', leaveRoutes);
 app.use('/api/leave', leaveRoutes); // Alias for compatibility
 app.use('/api/salary', salaryRoutes); // Registered Salary API Endpoint
 
-// Health check endpoint
+// Health check & test endpoints
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', time: new Date().toISOString() });
+});
+
+app.get('/', (req, res) => {
+    res.send('HRMS Backend API is running...');
 });
 
 // Seed Initial Admin User if not existing
@@ -66,20 +71,19 @@ async function seedAdmin() {
 
 // Database Connection & Server Initialization
 const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/hrm';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/hrms_db';
 
 mongoose.connect(MONGO_URI)
     .then(async () => {
         console.log('MongoDB Connected Successfully');
         await seedAdmin();
-        app.listen(PORT, () => {
+        app.listen(PORT, '0.0.0.0', () => {
             console.log(`Server running on port ${PORT}`);
         });
     })
     .catch((err) => {
         console.error('MongoDB connection error:', err);
-        // Still listen on port so health check / error diagnostics work
-        app.listen(PORT, () => {
+        app.listen(PORT, '0.0.0.0', () => {
             console.log(`Server running on port ${PORT} (Database disconnected)`);
         });
     });

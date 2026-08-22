@@ -7,7 +7,14 @@
       <div class="w-full lg:w-[56%] flex flex-col justify-between p-8 sm:p-10">
         <!-- Header Logo & Brand -->
         <div class="flex items-center gap-2.5">
-          <img src="/logo.png" alt="Dayflow Logo" class="h-8 w-auto object-contain" />
+          <svg class="w-7 h-7 text-[#172033]" viewBox="0 0 40 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 23C4.5 19.5 5 15 8 13.5C11 12 14.5 15 17 21" stroke="#172033" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 24C10 17 11.5 10 15 8C18 6 19.5 11 20 23" stroke="#172033" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M20 5C17.5 10 17.5 19 20 25C22.5 19 22.5 10 20 5Z" stroke="#172033" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M28 24C30 17 28.5 10 25 8C22 6 20.5 11 20 23" stroke="#172033" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M33 23C35.5 19.5 35 15 32 13.5C29 12 25.5 15 23 21" stroke="#172033" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M14 25C17 26 23 26 26 25" stroke="#172033" stroke-width="2" stroke-linecap="round"/>
+          </svg>
           <span class="text-2xl font-bold tracking-tight text-slate-900 font-serif" style="font-family: Georgia, serif;">Dayflow</span>
         </div>
 

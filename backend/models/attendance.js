@@ -56,10 +56,12 @@ const attendanceSchema = new mongoose.Schema(
         },
         status: {
             type: String,
-            default: 'present'
+            default: 'Present'
         }
     },
     { timestamps: true }
 );
+
+attendanceSchema.index({ userId: 1, date: 1 });
 
 module.exports = mongoose.model('Attendance', attendanceSchema);

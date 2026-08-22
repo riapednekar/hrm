@@ -64,7 +64,8 @@ router.post('/apply', verifyToken, async (req, res) => {
         res.status(201).json({
             message: 'Leave request submitted successfully!',
             leave: newLeave,
-            request: newLeave
+            request: newLeave,
+            leaveRequest: newLeave
         });
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -101,6 +102,7 @@ const handleGetAllLeaves = async (req, res) => {
                 designation: u.designation || 'Associate',
                 remarks: l.reason || l.remarks || '',
                 daysCount: l.days,
+                userId: u,
             };
         });
 
@@ -136,7 +138,8 @@ const handleUpdateLeaveStatus = async (req, res) => {
         res.json({
             message: `Leave request marked as ${normalizedStatus}!`,
             leave,
-            request: leave
+            request: leave,
+            leaveRequest: leave
         });
     } catch (err) {
         res.status(500).json({ message: err.message });

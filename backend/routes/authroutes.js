@@ -1,10 +1,8 @@
-import express from 'express';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import User from '../models/user.js';
-import { verifyToken } from '../middleware/auth.js';
-import { OAuth2Client } from 'google-auth-library';
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const express = require('express');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const User = require('../models/user');
+const { verifyToken } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -145,4 +143,4 @@ router.post('/change-password', verifyToken, async (req, res) => {
     }
 });
 
-export default router;
+module.exports = router;

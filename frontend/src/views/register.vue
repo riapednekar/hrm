@@ -159,36 +159,6 @@ export default {
     };
   },
   methods: {
-    mounted() {
-  if (window.google) {
-    window.google.accounts.id.initialize({
-      client_id: "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com",
-      callback: this.handleGoogleCallback,
-    });
-  }
-},
-methods: {
-  handleGoogleSignup() {
-    if (window.google) {
-      window.google.accounts.id.prompt();
-    }
-  },
-  async handleGoogleCallback(response) {
-    try {
-      const res = await api.post('/auth/google', {
-        token: response.credential,
-        companyName: this.companyName || 'Dayflow Org',
-      });
-
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
-
-      this.$router.push('/employees');
-    } catch (err) {
-      this.error = 'Google Sign-Up failed';
-    }
-  }
-}
     async handleRegister() {
       if (this.password !== this.confirmPassword) {
         this.error = 'Passwords do not match';
@@ -209,9 +179,6 @@ methods: {
         this.error = err.response?.data?.message || 'Registration failed';
       }
     },
-    handleGoogleSignUp() {
-      alert('Google Sign-up integration is ready to connect with OAuth credentials.');
-    }
   },
 };
 </script>

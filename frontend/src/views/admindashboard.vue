@@ -36,6 +36,12 @@
               {{ pendingLeavesCount }}
             </span>
           </button>
+          <router-link 
+            to="/salary" 
+            class="text-slate-500 hover:text-slate-900 transition cursor-pointer pb-1"
+          >
+            Salary & Payroll
+          </router-link>
         </nav>
       </div>
 
@@ -66,7 +72,8 @@
               <p class="text-[11px] text-slate-400 font-mono truncate">{{ user.email }}</p>
             </div>
             <button @click="openAddEmployeeModal(); showDropdown = false" class="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700 text-xs cursor-pointer">Add New Employee</button>
-            <button @click="$router.push('/employee/dashboard')" class="w-full text-left px-4 py-2 hover:bg-slate-50 text-[#593c8f] text-xs font-semibold cursor-pointer">Switch to Employee View</button>
+            <button @click="$router.push('/salary'); showDropdown = false" class="w-full text-left px-4 py-2 hover:bg-slate-50 text-[#593c8f] font-semibold text-xs cursor-pointer">Salary & Payroll</button>
+            <button @click="$router.push('/employee/dashboard')" class="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700 text-xs cursor-pointer">Switch to Employee View</button>
             <hr class="border-slate-100 my-1" />
             <button @click="logout" class="w-full text-left px-4 py-2 hover:bg-slate-50 text-rose-600 text-xs font-semibold cursor-pointer">Log Out</button>
           </div>

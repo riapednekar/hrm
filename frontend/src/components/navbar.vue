@@ -49,6 +49,13 @@
             >
               Leave Requests
             </router-link>
+            <router-link 
+              to="/salary" 
+              class="text-slate-600 hover:text-[#593c8f] transition pb-1"
+              active-class="text-[#593c8f] border-b-2 border-[#593c8f] font-bold"
+            >
+              Salary & Payroll
+            </router-link>
           </template>
 
           <template v-else>
@@ -65,6 +72,13 @@
               active-class="text-[#593c8f] border-b-2 border-[#593c8f] font-bold"
             >
               Attendance
+            </router-link>
+            <router-link 
+              to="/salary" 
+              class="text-slate-600 hover:text-[#593c8f] transition pb-1"
+              active-class="text-[#593c8f] border-b-2 border-[#593c8f] font-bold"
+            >
+              Salary & Payroll
             </router-link>
             <router-link 
               to="/leave" 

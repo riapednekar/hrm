@@ -47,9 +47,9 @@ const route = useRoute();
 const loading = ref(false);
 
 const loggedInUser = JSON.parse(localStorage.getItem('user') || '{}');
-const isAdmin = computed(() => loggedInUser.role === 'Admin');
+const isAdmin = computed(() => (loggedInUser.role || '').toLowerCase() === 'admin');
 
-// Default active tab (resume for all users, salary only if admin requested)
+// Default active tab (resume for all users)
 const activeTab = ref('resume');
 
 const employee = ref({
@@ -59,12 +59,12 @@ const employee = ref({
   phone: loggedInUser.phone || '+91 98765 43210',
   loginId: loggedInUser.loginId || loggedInUser.employeeId || 'EMP-2026-001',
   role: loggedInUser.role || 'Employee',
-  designation: loggedInUser.designation || 'Senior Software Engineer',
-  companyName: loggedInUser.companyName || 'TechCorp Global',
-  department: loggedInUser.department || 'Engineering & Product',
+  designation: loggedInUser.designation || 'Associate',
+  companyName: loggedInUser.companyName || 'Dayflow Inc.',
+  department: loggedInUser.department || 'General',
   manager: 'Sarah Jenkins (VP Eng)',
-  location: 'Mumbai, India (HQ)',
-  yearOfJoining: loggedInUser.yearOfJoining || 2024,
+  location: 'Dayflow HQ',
+  yearOfJoining: loggedInUser.yearOfJoining || 2026,
   status: 'Active'
 });
 
@@ -75,7 +75,7 @@ const currentTabComponent = computed(() => {
     case 'private':
       return PrivateInfo;
     case 'salary':
-      return isAdmin.value ? SalaryInfo : PrivateInfo;
+      return SalaryInfo;
     case 'security':
       return Security;
     default:

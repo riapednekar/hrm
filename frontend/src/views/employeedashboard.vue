@@ -33,6 +33,12 @@
           >
             Leave Requests
           </button>
+          <router-link 
+            to="/salary" 
+            class="text-slate-500 hover:text-slate-900 transition cursor-pointer pb-1"
+          >
+            Salary & Payroll
+          </router-link>
         </nav>
       </div>
 
@@ -75,6 +81,7 @@
             </div>
             <button @click="activeTab = 'overview'; showDropdown = false" class="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700 text-xs cursor-pointer">My Profile</button>
             <button @click="activeTab = 'leaves'; showDropdown = false" class="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700 text-xs cursor-pointer">Request Leave</button>
+            <button @click="$router.push('/salary'); showDropdown = false" class="w-full text-left px-4 py-2 hover:bg-slate-50 text-[#593c8f] font-semibold text-xs cursor-pointer">Salary & Payroll</button>
             <hr class="border-slate-100 my-1" />
             <button @click="logout" class="w-full text-left px-4 py-2 hover:bg-slate-50 text-rose-600 text-xs font-semibold cursor-pointer">Log Out</button>
           </div>
@@ -118,8 +125,8 @@
           </div>
         </div>
 
-        <!-- 3-Column Info Cards Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- 4-Column Info Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           
           <!-- Profile Card -->
           <div class="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
@@ -135,21 +142,17 @@
                 </div>
                 <div>
                   <span class="text-slate-400 block">Email Address</span>
-                  <span class="text-slate-700 font-medium">{{ user.email }}</span>
+                  <span class="text-slate-700 font-medium truncate block">{{ user.email }}</span>
                 </div>
                 <div>
-                  <span class="text-slate-400 block">Phone Number</span>
-                  <span class="text-slate-700 font-medium">{{ user.phone || 'Not provided' }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-400 block">Department & Designation</span>
+                  <span class="text-slate-400 block">Department</span>
                   <span class="text-slate-700 font-medium">{{ user.department || 'General' }} • {{ user.designation || 'Associate' }}</span>
                 </div>
               </div>
             </div>
             <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
               <span>Role: <strong class="text-[#593c8f] uppercase font-bold">{{ user.role }}</strong></span>
-              <span>Joined: {{ user.yearOfJoining || 2026 }}</span>
+              <button @click="$router.push('/profile')" class="text-xs text-[#593c8f] font-semibold hover:underline">Profile →</button>
             </div>
           </div>
 
@@ -168,15 +171,11 @@
 
               <div class="space-y-3 text-xs" v-if="todayRecord">
                 <div class="flex justify-between py-1 border-b border-slate-100">
-                  <span class="text-slate-500">Date</span>
-                  <span class="text-slate-900 font-mono font-medium">{{ todayRecord.date }}</span>
-                </div>
-                <div class="flex justify-between py-1 border-b border-slate-100">
-                  <span class="text-slate-500">Check In Time</span>
+                  <span class="text-slate-500">Check In</span>
                   <span class="text-emerald-700 font-mono font-bold">{{ formatTime(todayRecord.checkInTime) }}</span>
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-100">
-                  <span class="text-slate-500">Check Out Time</span>
+                  <span class="text-slate-500">Check Out</span>
                   <span class="text-rose-700 font-mono font-bold">{{ formatTime(todayRecord.checkOutTime) || 'In Progress' }}</span>
                 </div>
                 <div class="flex justify-between py-1">
@@ -185,7 +184,7 @@
                 </div>
               </div>
 
-              <div v-else class="text-center py-6 text-slate-400 text-xs">
+              <div v-else class="text-center py-5 text-slate-400 text-xs">
                 No check-in record for today yet.
               </div>
             </div>
@@ -207,35 +206,18 @@
                 <button @click="activeTab = 'leaves'" class="text-xs text-[#593c8f] font-semibold hover:underline cursor-pointer">Apply →</button>
               </div>
 
-              <div class="grid grid-cols-3 gap-2 text-center my-3">
-                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-                  <span class="text-lg font-extrabold text-slate-900 block">{{ leaveStats.total }}</span>
-                  <span class="text-[10px] text-slate-500 uppercase font-semibold">Total</span>
+              <div class="grid grid-cols-3 gap-1.5 text-center my-3">
+                <div class="bg-slate-50 p-2 rounded-xl border border-slate-200">
+                  <span class="text-base font-extrabold text-slate-900 block">{{ leaveStats.total }}</span>
+                  <span class="text-[9px] text-slate-500 uppercase font-semibold">Total</span>
                 </div>
-                <div class="bg-amber-50/60 p-2.5 rounded-xl border border-amber-200">
-                  <span class="text-lg font-extrabold text-amber-700 block">{{ leaveStats.pending }}</span>
-                  <span class="text-[10px] text-amber-700 uppercase font-semibold">Pending</span>
+                <div class="bg-amber-50/60 p-2 rounded-xl border border-amber-200">
+                  <span class="text-base font-extrabold text-amber-700 block">{{ leaveStats.pending }}</span>
+                  <span class="text-[9px] text-amber-700 uppercase font-semibold">Pending</span>
                 </div>
-                <div class="bg-emerald-50/60 p-2.5 rounded-xl border border-emerald-200">
-                  <span class="text-lg font-extrabold text-emerald-700 block">{{ leaveStats.approved }}</span>
-                  <span class="text-[10px] text-emerald-700 uppercase font-semibold">Approved</span>
-                </div>
-              </div>
-
-              <!-- Recent Leave Request Snippet -->
-              <div v-if="leaves.length > 0" class="mt-4 text-xs">
-                <p class="text-slate-400 text-[11px] mb-1">Latest Request:</p>
-                <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200 flex items-center justify-between">
-                  <div>
-                    <span class="font-bold text-slate-800">{{ leaves[0].leaveType }} Leave</span>
-                    <span class="text-[11px] text-slate-500 block">{{ leaves[0].startDate }} to {{ leaves[0].endDate }}</span>
-                  </div>
-                  <span 
-                    class="text-[10px] px-2 py-0.5 rounded font-bold"
-                    :class="getLeaveStatusBadge(leaves[0].status)"
-                  >
-                    {{ leaves[0].status }}
-                  </span>
+                <div class="bg-emerald-50/60 p-2 rounded-xl border border-emerald-200">
+                  <span class="text-base font-extrabold text-emerald-700 block">{{ leaveStats.approved }}</span>
+                  <span class="text-[9px] text-emerald-700 uppercase font-semibold">Approved</span>
                 </div>
               </div>
             </div>
@@ -244,7 +226,32 @@
               @click="activeTab = 'leaves'" 
               class="w-full mt-4 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs transition cursor-pointer"
             >
-              View All Requests
+              View Requests
+            </button>
+          </div>
+
+          <!-- Salary & Payroll Quick Card -->
+          <div class="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Salary & Payroll</h2>
+                <span class="text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full">Active</span>
+              </div>
+
+              <div class="space-y-3 text-xs my-2">
+                <div class="p-3 bg-purple-50/70 border border-purple-100 rounded-xl">
+                  <span class="text-[11px] text-slate-500 block">Est. Net Take-Home</span>
+                  <span class="text-xl font-extrabold text-[#593c8f] font-mono block mt-0.5">$6,250</span>
+                  <span class="text-[10px] text-purple-700">Direct Deposit on 31st</span>
+                </div>
+              </div>
+            </div>
+
+            <button 
+              @click="$router.push('/salary')" 
+              class="w-full mt-4 py-2.5 px-4 bg-[#593c8f] hover:bg-[#4a2e7b] text-white rounded-xl font-semibold text-xs transition cursor-pointer shadow-sm text-center"
+            >
+              View Full Payroll →
             </button>
           </div>
 

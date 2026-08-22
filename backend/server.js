@@ -13,6 +13,7 @@ const authRoutes = require('./routes/authroutes');
 const employeeRoutes = require('./routes/employeeroutes');
 const attendanceRoutes = require('./routes/attendanceroutes');
 const leaveRoutes = require('./routes/leaveroutes');
+const salaryRoutes = require('./routes/salaryroutes'); // Added Salary Routes
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use('/api/employees', employeeRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/leaves', leaveRoutes);
 app.use('/api/leave', leaveRoutes); // Alias for compatibility
+app.use('/api/salary', salaryRoutes); // Registered Salary API Endpoint
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -35,10 +37,10 @@ app.get('/api/health', (req, res) => {
 // Seed Initial Admin User if not existing
 async function seedAdmin() {
     try {
-        const existingAdmin = await User.findOne({ 
-            $or: [{ email: 'admin@dayflow.com' }, { role: 'admin' }] 
+        const existingAdmin = await User.findOne({
+            $or: [{ email: 'admin@dayflow.com' }, { role: 'admin' }]
         });
-        
+
         if (!existingAdmin) {
             const hashedPassword = await bcrypt.hash('admin123', 10);
             const adminUser = new User({

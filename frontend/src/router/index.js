@@ -9,6 +9,7 @@ import attendance from '../views/attendance.vue';
 import adminAttendance from '../views/admin-attendance.vue';
 import leave from '../views/leave.vue';
 import adminLeaves from '../views/admin-leaves.vue';
+import salary from '../views/salary.vue';
 
 const routes = [
     { path: '/', redirect: '/login' },
@@ -66,7 +67,7 @@ const routes = [
     },
     {
         path: '/salary',
-        component: () => import('../views/Profile/SalaryInfo.vue'),
+        component: salary,
         meta: { requiresAuth: true }
     },
 ];

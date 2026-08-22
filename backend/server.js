@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
 
 // MongoDB Connection
 mongoose
-    .connect(process.env.MONGO_URI)
+    .connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/hrm_db')
     .then(() => console.log('MongoDB Connected Successfully'))
     .catch((err) => console.error('MongoDB Connection Error:', err));
 

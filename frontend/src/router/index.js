@@ -8,12 +8,16 @@ const routes = [
     { path: '/login', component: login },
     { path: '/register', component: register },
     { path: '/employees', component: employees, meta: { requiresAuth: true, requiresAdmin: true } },
+    { path: '/profile', component: () => import('../views/Profile/MyProfile.vue'), meta: { requiresAuth: true } },
+    { path: '/profile/:id', component: () => import('../views/Profile/MyProfile.vue'), meta: { requiresAuth: true } },
+    { path: '/salary', component: () => import('../views/Profile/SalaryInfo.vue'), meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({
     history: createWebHistory(),
     routes,
 });
+
 
 router.beforeEach((to, from, next) => {
     const token = localStorage.getItem('token');

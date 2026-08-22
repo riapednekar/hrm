@@ -5,11 +5,18 @@ import employeedashboard from '../views/employeedashboard.vue';
 import admindashboard from '../views/admindashboard.vue';
 import employees from '../views/employees.vue';
 import employeedetail from '../views/employeedetail.vue';
+=======
+import attendance from '../views/attendance.vue';
+import adminAttendance from '../views/admin-attendance.vue';
+import leave from '../views/leave.vue';
+import adminLeaves from '../views/admin-leaves.vue';
+>>>>>>> member3
 
 const routes = [
     { path: '/', redirect: '/login' },
     { path: '/login', component: login },
     { path: '/register', component: register },
+<<<<<<< HEAD
     {
         path: '/employee/dashboard',
         component: employeedashboard,
@@ -45,6 +52,13 @@ const routes = [
         component: () => import('../views/Profile/SalaryInfo.vue'),
         meta: { requiresAuth: true }
     },
+=======
+    { path: '/employees', component: employees, meta: { requiresAuth: true, requiresAdmin: true } },
+    { path: '/attendance', component: attendance, meta: { requiresAuth: true } },
+    { path: '/admin/attendance', component: adminAttendance, meta: { requiresAuth: true, requiresAdmin: true } },
+    { path: '/leave', component: leave, meta: { requiresAuth: true } },
+    { path: '/admin/leaves', component: adminLeaves, meta: { requiresAuth: true, requiresAdmin: true } },
+>>>>>>> member3
 ];
 
 const router = createRouter({

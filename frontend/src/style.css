@@ -1,1 +1,25 @@
 @import "tailwindcss";
+
+:root {
+  --primary-purple: #6040A0;
+  --primary-purple-dark: #4B2F78;
+  --purple-light: #F3EEFA;
+  --purple-border: #E5DCF4;
+  --background: #F6F8FB;
+  --card: #FFFFFF;
+  --border: #E7EAF0;
+  --border-light: #F1F4F9;
+  --text: #172033;
+  --text-muted: #7B8496;
+  --success: #16A34A;
+  --success-light: #DCFCE7;
+  --success-border: #BBF7D0;
+  --warning: #D97706;
+  --warning-light: #FEF3C7;
+  --warning-border: #FDE68A;
+  --danger: #DC2626;
+  --danger-light: #FEE2E2;
+  --danger-border: #FECACA;
+  --radius-card: 16px;
+  --radius-btn: 8px;
+}

@@ -34,10 +34,10 @@ router.post('/toggle', verifyToken, async (req, res) => {
                 status: 'present',
             });
             await record.save();
-            return res.json({ 
-                message: 'Checked In Successfully!', 
-                isCheckedIn: true, 
-                record 
+            return res.json({
+                message: 'Checked In Successfully!',
+                isCheckedIn: true,
+                record
             });
         } else if (!record.checkOutTime) {
             // Already checked in -> Check Out
@@ -50,20 +50,20 @@ router.post('/toggle', verifyToken, async (req, res) => {
             record.totalHours = parseFloat((diffMs / (1000 * 60 * 60)).toFixed(2));
 
             await record.save();
-            return res.json({ 
-                message: 'Checked Out Successfully!', 
-                isCheckedIn: false, 
-                record 
+            return res.json({
+                message: 'Checked Out Successfully!',
+                isCheckedIn: false,
+                record
             });
         } else {
             // Re-check in on the same day (toggle back to present)
             record.checkOutTime = null;
             record.status = 'present';
             await record.save();
-            return res.json({ 
-                message: 'Checked In Again!', 
-                isCheckedIn: true, 
-                record 
+            return res.json({
+                message: 'Checked In Again!',
+                isCheckedIn: true,
+                record
             });
         }
     } catch (err) {

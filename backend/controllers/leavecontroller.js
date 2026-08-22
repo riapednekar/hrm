@@ -1,6 +1,6 @@
 const LeaveRequest = require('../models/LeaveRequest');
 const LeaveBalance = require('../models/LeaveBalance');
-const Attendance = require('../models/Attendance');
+const Attendance = require('../models/attendance');
 
 // Helper to calculate calendar days inclusively between two dates
 const calculateDays = (startDate, endDate) => {

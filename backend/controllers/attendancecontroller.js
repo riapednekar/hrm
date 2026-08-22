@@ -1,4 +1,4 @@
-const Attendance = require('../models/Attendance');
+const Attendance = require('../models/attendance');
 
 // Helper to get current date in YYYY-MM-DD format
 const getTodayDate = () => {

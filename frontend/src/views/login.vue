@@ -119,12 +119,7 @@ export default {
         if (role === 'admin') {
           this.$router.push('/admin/dashboard');
         } else {
-<<<<<<< HEAD
           this.$router.push('/employee/dashboard');
-=======
-          this.$router.push('/attendance');
-
->>>>>>> member3
         }
       } catch (err) {
         this.error = err.response?.data?.message || 'Login failed';

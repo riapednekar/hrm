@@ -5,6 +5,7 @@ require('dotenv').config();
 
 const authroutes = require('./routes/authroutes');
 const employeeroutes = require('./routes/employeeroutes');
+const attendanceroutes = require('./routes/attendanceroutes');
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(cors());
 // Routes
 app.use('/api/auth', authroutes);
 app.use('/api/employees', employeeroutes);
+app.use('/api/attendance', attendanceroutes);
 
 // Test Route
 app.get('/', (req, res) => {

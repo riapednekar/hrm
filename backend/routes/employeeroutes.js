@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { getAllEmployees, getEmployeeById } = require('../controllers/employeecontroller');
+const { getAllEmployees, getEmployeeById, createEmployee } = require('../controllers/employeecontroller');
 const { verifyToken, verifyAdmin } = require('../middleware/auth');
 
-// Protected routes (Requires valid JWT + Admin Role)
+// Protected routes
 router.get('/', verifyToken, verifyAdmin, getAllEmployees);
-router.get('/:id', verifyToken, verifyAdmin, getEmployeeById);
+router.post('/', verifyToken, verifyAdmin, createEmployee);
+router.get('/:id', verifyToken, getEmployeeById);
 
 module.exports = router;

@@ -1,31 +1,19 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-require('dotenv').config();
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import authRoutes from './routes/authroutes.js';
+import employeeRoutes from './routes/employeeroutes.js';
 
-const authroutes = require('./routes/authroutes');
-const employeeroutes = require('./routes/employeeroutes');
+dotenv.config();
 
 const app = express();
-
-// Middleware
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 
-// Routes
-app.use('/api/auth', authroutes);
-app.use('/api/employees', employeeroutes);
-
-// Test Route
-app.get('/', (req, res) => {
-    res.send('HRMS Backend API is running...');
-});
-
-// MongoDB Connection
-mongoose
-    .connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/hrm_db')
-    .then(() => console.log('MongoDB Connected Successfully'))
-    .catch((err) => console.error('MongoDB Connection Error:', err));
+app.use('/api/auth', authRoutes);
+app.use('/api/employees', employeeRoutes);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});

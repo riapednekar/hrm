@@ -115,7 +115,12 @@ export default {
           alert('First login detected. Please change your auto-generated password.');
         }
 
-        this.$router.push('/employees');
+        const role = (res.data.user.role || 'employee').toLowerCase();
+        if (role === 'admin') {
+          this.$router.push('/admin/dashboard');
+        } else {
+          this.$router.push('/employee/dashboard');
+        }
       } catch (err) {
         this.error = err.response?.data?.message || 'Login failed';
       }

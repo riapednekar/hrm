@@ -8,21 +8,17 @@ const router = express.Router();
 
 // Helper to generate custom Login ID
 async function generateLoginId(companyName, firstName, lastName, year) {
-    // 1. Company initials (First two letters of first word or company code)
-    const compCode = companyName.substring(0, 2).toUpperCase();
+    const compCode = (companyName || 'DF').substring(0, 2).toUpperCase();
+    const fnCode = (firstName || 'EM').substring(0, 2).toUpperCase();
+    const lnCode = (lastName || 'PL').substring(0, 2).toUpperCase();
 
-    // 2. Name initials (First two of first name + first two of last name)
-    const fnCode = firstName.substring(0, 2).toUpperCase();
-    const lnCode = lastName.substring(0, 2).toUpperCase();
-
-    // 3. Count existing users for this company & year to set serial number
     const count = await User.countDocuments({ companyName, yearOfJoining: year });
     const serial = String(count + 1).padStart(4, '0');
 
     return `${compCode}${fnCode}${lnCode}${year}${serial}`;
 }
 
-// Register Company Admin
+// Register (ALWAYS creates role: "employee")
 router.post('/register', async (req, res) => {
     try {
         const { companyName, name, email, phone, password, companyLogo } = req.body;
@@ -30,29 +26,34 @@ router.post('/register', async (req, res) => {
         const existingUser = await User.findOne({ email });
         if (existingUser) return res.status(400).json({ message: 'Email already exists' });
 
-        const [firstName, ...rest] = name.trim().split(' ');
+        const [firstName, ...rest] = (name || '').trim().split(' ');
         const lastName = rest.join(' ') || 'User';
         const currentYear = new Date().getFullYear();
 
-        const loginId = await generateLoginId(companyName, firstName, lastName, currentYear);
+        const loginId = await generateLoginId(companyName || 'Dayflow Org', firstName, lastName, currentYear);
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        // Enforce role: 'employee' regardless of any client input
         const newUser = new User({
-            companyName,
-            firstName,
-            lastName,
+            companyName: companyName || 'Dayflow Org',
+            firstName: firstName || 'New',
+            lastName: lastName || 'Employee',
             email,
             phone,
             password: hashedPassword,
             loginId,
-            role: 'Admin',
+            role: 'employee',
             companyLogo,
             yearOfJoining: currentYear,
             isFirstLogin: false,
         });
 
         await newUser.save();
-        res.status(201).json({ message: 'Registration successful!', loginId });
+        res.status(201).json({ 
+            message: 'Registration successful!', 
+            loginId, 
+            role: 'employee' 
+        });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -63,6 +64,10 @@ router.post('/login', async (req, res) => {
     try {
         const { loginIdentifier, password } = req.body;
 
+        if (!loginIdentifier || !password) {
+            return res.status(400).json({ message: 'Login ID/Email and password are required' });
+        }
+
         const user = await User.findOne({
             $or: [{ email: loginIdentifier }, { loginId: loginIdentifier }]
         });
@@ -72,54 +77,50 @@ router.post('/login', async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
+        const normalizedRole = (user.role || 'employee').toLowerCase();
+
         const token = jwt.sign(
-            { id: user._id, role: user.role, loginId: user.loginId, companyName: user.companyName },
+            { 
+                id: user._id, 
+                role: normalizedRole, 
+                loginId: user.loginId, 
+                companyName: user.companyName,
+                email: user.email 
+            },
             process.env.JWT_SECRET || 'secretkey',
             { expiresIn: '1d' }
         );
 
-        res.json({ token, user });
+        res.json({
+            token,
+            user: {
+                id: user._id,
+                _id: user._id,
+                loginId: user.loginId,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                phone: user.phone,
+                companyName: user.companyName,
+                department: user.department || 'General',
+                designation: user.designation || 'Associate',
+                role: normalizedRole,
+                isFirstLogin: user.isFirstLogin,
+            },
+        });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 });
 
-// Admin creates a new Employee with Auto-Generated Password and Login ID
-router.post('/create-employee', verifyToken, async (req, res) => {
+// Get Current Logged-in User Profile
+router.get('/me', verifyToken, async (req, res) => {
     try {
-        if (req.user.role !== 'Admin') {
-            return res.status(403).json({ message: 'Admin access required' });
-        }
-
-        const { name, email, phone } = req.body;
-        const [firstName, ...rest] = name.trim().split(' ');
-        const lastName = rest.join(' ') || 'User';
-        const currentYear = new Date().getFullYear();
-
-        const loginId = await generateLoginId(req.user.companyName, firstName, lastName, currentYear);
-
-        // Auto-generate temporary password
-        const tempPassword = Math.random().toString(36).slice(-8);
-        const hashedPassword = await bcrypt.hash(tempPassword, 10);
-
-        const newEmployee = new User({
-            companyName: req.user.companyName,
-            firstName,
-            lastName,
-            email,
-            phone,
-            password: hashedPassword,
-            loginId,
-            role: 'Employee',
-            yearOfJoining: currentYear,
-            isFirstLogin: true,
-        });
-
-        await newEmployee.save();
-        res.status(201).json({
-            message: 'Employee created successfully',
-            loginId,
-            tempPassword
+        const user = await User.findById(req.user.id).select('-password');
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        res.json({
+            ...user.toObject(),
+            role: (user.role || 'employee').toLowerCase(),
         });
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -130,6 +131,9 @@ router.post('/create-employee', verifyToken, async (req, res) => {
 router.post('/change-password', verifyToken, async (req, res) => {
     try {
         const { newPassword } = req.body;
+        if (!newPassword || newPassword.length < 6) {
+            return res.status(400).json({ message: 'Password must be at least 6 characters' });
+        }
         const hashedPassword = await bcrypt.hash(newPassword, 10);
 
         await User.findByIdAndUpdate(req.user.id, {

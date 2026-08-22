@@ -10,20 +10,24 @@ const verifyToken = (req, res, next) => {
     }
 
     try {
-        const verified = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = verified; // Payload: { id, role, email, employeeId }
+        const verified = jwt.verify(token, process.env.JWT_SECRET || 'secretkey');
+        req.user = verified; // Payload: { id, role, email, loginId, companyName }
+        if (req.user.role) {
+            req.user.role = req.user.role.toLowerCase();
+        }
         next();
     } catch (err) {
-        res.status(403).json({ message: 'Invalid or Expired Token' });
+        return res.status(403).json({ message: 'Invalid or Expired Token' });
     }
 };
 
 // Middleware to restrict access to Admin users only
 const verifyAdmin = (req, res, next) => {
-    if (req.user && req.user.role === 'Admin') {
+    const role = (req.user && req.user.role) ? req.user.role.toLowerCase() : '';
+    if (role === 'admin') {
         next();
     } else {
-        res.status(403).json({ message: 'Access Denied: Admin privileges required' });
+        return res.status(403).json({ message: 'Forbidden: Admin privileges required' });
     }
 };
 
